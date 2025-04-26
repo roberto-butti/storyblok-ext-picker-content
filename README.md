@@ -5,6 +5,8 @@ It allows users to select external data — specifically fetching and picking co
 
 This plugin is ideal for cases where you need to reference content maintained in another project or space, while keeping a seamless editing experience for your content editors.
 
+![The screenshot of 3rd part content picker in action](./docs/picker-screenshot.webp)
+
 ## ✨ Features
 
 - Fetch external stories from a different Storyblok space
