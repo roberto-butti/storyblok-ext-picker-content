@@ -1,88 +1,55 @@
-# Picker Starter
+# 3rd Party Content Picker
 
-A starter project for building e-commerce [field plugins](https://www.storyblok.com/docs/plugins/field-plugins/introduction) and other “picker” field plugins – for example, integrations with digital asset management (DAM) systems.
+This repository contains a custom field plugin for Storyblok, built using the Picker Starter template.
+It allows users to select external data — specifically fetching and picking content from a different Storyblok space — directly within the Storyblok visual editor.
 
-![screenshot](./docs/screenshot.png)
+This plugin is ideal for cases where you need to reference content maintained in another project or space, while keeping a seamless editing experience for your content editors.
 
-The primary goal of this starter is to provide developers with a clear blueprint for creating their own `pickers` just by making small changes to it.
+## ✨ Features
 
-## `picker.config.ts`
+- Fetch external stories from a different Storyblok space
+- Filter stories dynamically using starts_with and other parameters
+- Pick and link external content easily within the editor
+- Built on top of the official Storyblok Picker Starter
+- Lightweight and easy to customize for different APIs or spaces
 
-The [`picker.config.ts`](./src/picker.config.ts) is a configuration file where you can customize the title, icon, tabs, filters, methods to perform queries, and also a method to validate the expected [plugin options](https://www.storyblok.com/docs/plugins/field-plugins/introduction#options).
+## ⚙️ How it works
 
-In the example below you can have a glimpse of what this file looks like and its responsibilities:
+The plugin uses Storyblok’s Field-Type Plugin API combined with the Content Delivery API to fetch stories from another space.
+It allows content editors to browse, search, and select external items, storing the selection as a reference inside the field.
 
-```js
-export default defineConfig((options) => {
-  return {
-    title: 'Picker Starter', //(1) modal's title
-    icon: StoryblokIcon, //(2) modal's icon
-    validateOptions: () => {
-      //(3) optional function responsible for validating the plugin's options and showing a warning box in case of failure.
-      const { limit } = options
+Internally, it:
 
-      const isLimitOptionValid = limit === undefined || Number(limit) > 0
+- Sends a fetch request to the external Storyblok space using the Content Delivery API access token.
+- Filters the available stories based on a starts_with parameter or custom queries.
+- Displays the results in a simple picker UI.
+- Saves the selected story’s identifier or custom data into the field value.
 
-      if (!isLimitOptionValid) {
-        //(3) In case of failure, the returned object needs to look like this
-        return {
-          isValid: false,
-          error: `The 'limit' option must be an integer greater than 0`,
-        }
-      }
+## 🛠️ Usage
 
-      //If all the options are valid (in case it relies on options)
-      //the returned object will look like this
-      return {
-        isValid: true,
-      }
-    },
-    tabs: [
-      //(4) All of your Picker's tabs.
-      //You can have as many as your picker needs.
-      {
-        name: 'items', //mandatory field used to identify this tab
-        label: 'Items', //(5) displayed in the modal
-        query: queryItems, //(6) it fetches, sorts, and filter all the data for this tab
-        getFilters: getItemFilters, //(7) select input acting like filters to the data
-      },
-    ],
-  }
-})
-```
+- Add the plugin to your content type schema as a custom field.
+- Configure the plugin options if needed (e.g., API token, space ID, starts_with path).
+- Editors can now pick external stories directly from the field.
+- The field will store the selected story’s ID or custom payload, ready for use in rendering or API queries.
 
-![mapping 1 picker.config.ts](./docs/picker.config-1.png)
-![mapping 2 picker.config.ts](./docs/picker.config-2.png)
+## ⚙️ Configuration options
 
-## Local Development
 
-To start using this starter locally in your project, just run:
 
-```sh
-# copy this starter into your cwd
-npx giget@latest gh:storyblok/field-type-examples/picker-starter YOUR-PROJECT-NAME
+| Option        | Type     | Description                                                  | Example                    |
+| ------------- | -------- | ------------------------------------------------------------ | -------------------------- |
+| `accessToken` | `string` | **Required.** The API access token for the external Storyblok space you want to fetch stories from. | `"your-public-token"`      |
+| `version`     | `string` | **Optional.** Defines whether to fetch `draft` or `published` content. Defaults to `"draft"`. | `"draft"` or `"published"` |
+| `startsWith`  | `string` | **Optional.** Filters the fetched stories to only those whose full slug starts with the given prefix. Defaults to `"default"` | `"blog/"` or `"products/"` |
 
-# open it
-cd YOUR-PROJECT-NAME
+### Notes:
 
-# install all required dependencies
-yarn install
+- If `startsWith` is omitted, all stories in the space will be fetched (use with caution in large spaces).
+- Make sure the `accessToken` has access to the correct content version (`draft` or `published`) you want to fetch.
 
-# then, serve the field plugin
-yarn dev
-```
+## 📚 References
 
-Now open the Sandbox URL printed in your terminal:
-![open sandbox url](./docs/open-sandbox-url.png)
-
-You should see this:
-
-![picker starter loaded](./docs/loaded-sandbox.png)
-
-## Deploy
-
-Deploy your field plugin with the [CLI](https://www.npmjs.com/package/@storyblok/field-plugin-cli). Issue a [personal access token](https://app.storyblok.com/#/me/account?tab=token), rename `.env.local.example` to `.env.example`, open the file, set the value `STORYBLOK_PERSONAL_ACCESS_TOKEN`, and from the **plugin's root folder**, run the following command:
-
-```shell
-yarn deploy
-```
+- [Storyblok Field Plugin Documentation](https://www.storyblok.com/docs/plugins/field-plugins/)
+   Official guide on how to build, configure, and use custom field-type plugins in Storyblok.
+- [Picker Starter Boilerplate](https://github.com/storyblok/field-type-examples/tree/main/picker-starter)
+   This plugin is built on top of Storyblok’s **Picker Starter** example, providing a solid foundation for custom picker implementations.
